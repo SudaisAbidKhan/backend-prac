@@ -23,6 +23,7 @@ userRouter.route("/register").post(
   ]),
   registerUser,
 );
+
 userRouter.route("/login").post(loginUser);
 
 //secured routes
