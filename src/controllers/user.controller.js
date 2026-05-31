@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js";
 import uploadOnCloudinary from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 //Access and Refresh token
 const generateAccessAndRefreshToken = async (userId) => {
@@ -162,9 +163,12 @@ const logoutUser = asyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
     req.user._id,
     {
-      $set: {
-        refreshToken: undefined,
-      },
+      // $set: {
+      //   refreshToken: null,
+      // },
+      $unset: {
+        refreshToken: 1 // this removes the field from the document
+      }
     },
     {
       new: true,
@@ -286,9 +290,10 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user?._id);
-  if (user.avatar) {
-    const publicId = user.avatar.split("/").pop().split(".")[0];
+  const existungUser = await User.findById(req.user?._id);
+
+  if (existungUser.avatar) {
+    const publicId = existungUser.avatar.split("/").pop().split(".")[0];
     await cloudinary.uploader.destory(publicId);
   }
 
@@ -320,9 +325,9 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
 });
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user?._id);
-  if (user.coverImage) {
-    const publicId = user.avatar.split("/").pop().split(".")[0];
+  const existungUser = await User.findById(req.user?._id);
+  if (existungUser.coverImage) {
+    const publicId = existungUser.avatar.split("/").pop().split(".")[0];
     await cloudinary.uploader.destory(publicId);
   }
 
